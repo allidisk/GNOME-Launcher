@@ -8,7 +8,7 @@ import androidx.activity.ComponentActivity
 class WallpaperPickerActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val intent = Intent(WallpaperManager.ACTION_SET_WALLPAPER)
+        val intent = Intent(Intent.ACTION_SET_WALLPAPER)
         startActivity(Intent.createChooser(intent, "Select Wallpaper"))
         finish()
     }

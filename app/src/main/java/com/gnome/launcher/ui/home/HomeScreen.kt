@@ -97,7 +97,7 @@ fun HomeScreen(
                 onWallpaperClick = {
                     val intent = Intent(WallpaperManager.ACTION_CHANGE_LIVE_WALLPAPER)
                         .takeIf { context.packageManager.resolveActivity(it, 0) != null }
-                        ?: Intent(WallpaperManager.ACTION_SET_WALLPAPER)
+                        ?: Intent(Intent.ACTION_SET_WALLPAPER)
                     wallpaperLauncher.launch(intent)
                 }
             )

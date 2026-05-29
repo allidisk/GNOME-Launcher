@@ -74,7 +74,7 @@ private fun HostedWidget(
             .height(minHeight.dp)
             .clip(RoundedCornerShape(16.dp))
             .background(GnomeColors.Surface.copy(alpha = 0.7f))
-            .combinedClickable(
+            .clickable(
                 onClick = {},
                 onLongClick = { showRemove = !showRemove }
             )

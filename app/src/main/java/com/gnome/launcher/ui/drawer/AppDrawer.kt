@@ -241,7 +241,7 @@ fun AppGridItem(
                 },
                 onClick = {}
             )
-            HorizontalDivider(color = GnomeColors.Divider)
+            Divider(color = GnomeColors.Divider)
 
             // Pin / Unpin
             DropdownMenuItem(
