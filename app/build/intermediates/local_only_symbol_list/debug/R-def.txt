@@ -1,0 +1,6 @@
+R_DEF: Internal format may change without notice
+local
+drawable default_wallpaper
+string app_name
+style Theme.GnomeLauncher
+style Theme.GnomeLauncher.Dialog
