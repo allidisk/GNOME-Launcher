@@ -17,7 +17,7 @@ class AppRepository(private val context: Context) {
             addCategory(Intent.CATEGORY_LAUNCHER)
         }
 
-        val resolveInfoList: List<ResolveInfo> = pm.queryIntentActivities(intent, PackageManager.MATCH_ALL)
+        val resolveInfoList: List<ResolveInfo> = pm.queryIntentActivities(intent, PackageManager.GET_META_DATA)
 
         val apps = resolveInfoList
             .map { info ->
