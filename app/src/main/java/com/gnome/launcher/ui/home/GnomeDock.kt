@@ -137,7 +137,6 @@ fun DockIcon(
             expanded = showMenu,
             onDismissRequest = { showMenu = false },
             offset = DpOffset(0.dp, 4.dp),
-            containerColor = GnomeColors.Surface,
         ) {
             DropdownMenuItem(
                 text = {

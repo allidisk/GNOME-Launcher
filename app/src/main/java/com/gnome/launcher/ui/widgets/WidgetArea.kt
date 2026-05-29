@@ -76,7 +76,7 @@ private fun HostedWidget(
             .background(GnomeColors.Surface.copy(alpha = 0.7f))
             .clickable(
                 onClick = {},
-                onLongClick = { showRemove = !showRemove }
+                
             )
     ) {
         val widgetHost = remember {
