@@ -4,6 +4,7 @@ import android.appwidget.AppWidgetHost
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProviderInfo
 import android.content.Context
+import androidx.compose.animation.*
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -36,7 +37,7 @@ fun WidgetArea(
     val widgetManager = remember { AppWidgetManager.getInstance(context) }
 
     Column(
-        modifier = modifier.verticalScroll(rememberScrollState()),
+        modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         widgetIds.forEach { appWidgetId ->
@@ -64,16 +65,19 @@ private fun HostedWidget(
     info: AppWidgetProviderInfo,
     onRemove: () -> Unit
 ) {
-    val heightDp = (info.minHeight.coerceIn(100, 200)).dp
+    val minHeight = maxOf(info.minHeight, 100)
     var showRemove by remember { mutableStateOf(false) }
 
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(heightDp)
+            .height(minHeight.dp)
             .clip(RoundedCornerShape(16.dp))
             .background(GnomeColors.Surface.copy(alpha = 0.7f))
-            .clickable(onClick = { showRemove = !showRemove })
+            .combinedClickable(
+                onClick = {},
+                onLongClick = { showRemove = !showRemove }
+            )
     ) {
         val widgetHost = remember {
             AppWidgetHost(context, APPWIDGET_HOST_ID).also { it.startListening() }
@@ -92,11 +96,17 @@ private fun HostedWidget(
             modifier = Modifier.fillMaxSize()
         )
 
-        if (showRemove) {
+        // Remove button overlay (shown on long press)
+        AnimatedVisibility(
+            visible = showRemove,
+            enter = fadeIn() + scaleIn(initialScale = 0.7f),
+            exit = fadeOut() + scaleOut(targetScale = 0.7f),
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(8.dp)
+        ) {
             Box(
                 modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .padding(8.dp)
                     .size(28.dp)
                     .clip(CircleShape)
                     .background(MaterialTheme.colorScheme.error)
@@ -121,7 +131,11 @@ private fun AddWidgetButton(onClick: () -> Unit) {
             .fillMaxWidth()
             .height(80.dp)
             .clip(RoundedCornerShape(16.dp))
-            .border(1.dp, GnomeColors.Divider, RoundedCornerShape(16.dp))
+            .border(
+                width = 1.dp,
+                color = GnomeColors.Divider,
+                shape = RoundedCornerShape(16.dp)
+            )
             .clickable { onClick() },
         contentAlignment = Alignment.Center
     ) {
@@ -129,8 +143,18 @@ private fun AddWidgetButton(onClick: () -> Unit) {
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Icon(Icons.Default.Add, null, tint = GnomeColors.Accent, modifier = Modifier.size(20.dp))
-            Text("Add widget", color = GnomeColors.Accent, fontSize = 14.sp, fontWeight = FontWeight.Medium)
+            Icon(
+                imageVector = Icons.Default.Add,
+                contentDescription = null,
+                tint = GnomeColors.Accent,
+                modifier = Modifier.size(20.dp)
+            )
+            Text(
+                text = "Add widget",
+                color = GnomeColors.Accent,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Medium
+            )
         }
     }
 }

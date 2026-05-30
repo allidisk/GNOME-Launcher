@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.GnomeLauncher" parent="android:Theme.Black.NoTitleBar.Fullscreen">
+    <style name="Theme.GnomeLauncher" parent="android:Theme.Material.NoTitleBar.Fullscreen">
         <item name="android:windowBackground">@android:color/transparent</item>
         <item name="android:colorBackgroundCacheHint">@null</item>
         <item name="android:windowShowWallpaper">true</item>
@@ -8,7 +8,7 @@
         <item name="android:windowTranslucentNavigation">true</item>
     </style>
 
-    <style name="Theme.GnomeLauncher.Dialog" parent="android:Theme.Dialog">
+    <style name="Theme.GnomeLauncher.Dialog" parent="android:Theme.Material.Dialog">
         <item name="android:windowBackground">@android:color/transparent</item>
     </style>
 </resources>

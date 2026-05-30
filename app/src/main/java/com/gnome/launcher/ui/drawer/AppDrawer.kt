@@ -226,6 +226,7 @@ fun AppGridItem(
             expanded = showMenu,
             onDismissRequest = { showMenu = false },
             offset = DpOffset(0.dp, (-8).dp),
+            containerColor = GnomeColors.Surface
         ) {
             // App name header
             DropdownMenuItem(
@@ -240,7 +241,7 @@ fun AppGridItem(
                 },
                 onClick = {}
             )
-            Divider(color = GnomeColors.Divider)
+            HorizontalDivider(color = GnomeColors.Divider)
 
             // Pin / Unpin
             DropdownMenuItem(
