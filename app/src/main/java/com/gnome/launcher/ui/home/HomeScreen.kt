@@ -8,17 +8,26 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.*
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.grid.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.gnome.launcher.LauncherViewModel
 import com.gnome.launcher.ui.GnomeColors
 import com.gnome.launcher.ui.widgets.WidgetArea
 import com.gnome.launcher.ui.widgets.WidgetPickerActivity
+import com.google.accompanist.drawablepainter.DrawablePainter
 
 @Composable
 fun HomeScreen(
@@ -29,12 +38,10 @@ fun HomeScreen(
     val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsState()
 
-    // Wallpaper picker
     val wallpaperLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.StartActivityForResult()
-    ) { /* handled by system */ }
+    ) { }
 
-    // Widget picker: receives the final widget ID after pick + optional config
     val widgetPickerLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
@@ -43,7 +50,6 @@ fun HomeScreen(
                 AppWidgetManager.EXTRA_APPWIDGET_ID,
                 AppWidgetManager.INVALID_APPWIDGET_ID
             ) ?: AppWidgetManager.INVALID_APPWIDGET_ID
-
             if (widgetId != AppWidgetManager.INVALID_APPWIDGET_ID) {
                 viewModel.addWidget(widgetId)
             }
@@ -60,7 +66,6 @@ fun HomeScreen(
                 }
             }
     ) {
-        // Wallpaper gradient overlay
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -74,31 +79,68 @@ fun HomeScreen(
         Column(modifier = Modifier.fillMaxSize()) {
             GnomeTopBar(onActivitiesClick = onOpenDrawer)
 
-            // Widget area — fully wired with real IDs and callbacks
-            WidgetArea(
-                widgetIds = uiState.widgetIds,
-                onAddWidgetClick = {
-                    val intent = Intent(context, WidgetPickerActivity::class.java)
-                    widgetPickerLauncher.launch(intent)
-                },
-                onRemoveWidget = { viewModel.removeWidget(it) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-                    .padding(16.dp)
-            )
+            // Pinned apps grid on home screen
+            if (uiState.pinnedApps.isNotEmpty()) {
+                LazyVerticalGrid(
+                    columns = GridCells.Adaptive(80.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    contentPadding = PaddingValues(bottom = 8.dp)
+                ) {
+                    items(uiState.pinnedApps, key = { it.packageName }) { app ->
+                        Column(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(14.dp))
+                                .clickable { viewModel.launchApp(app.packageName) }
+                                .padding(8.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            Image(
+                                painter = DrawablePainter(app.icon),
+                                contentDescription = app.label,
+                                modifier = Modifier.size(52.dp)
+                            )
+                            Text(
+                                text = app.label,
+                                color = GnomeColors.TextPrimary,
+                                fontSize = 11.sp,
+                                textAlign = TextAlign.Center,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
+                    }
+                }
+            } else {
+                // Empty state hint
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "Long-press apps in the drawer\nto pin them here",
+                        color = GnomeColors.TextDisabled,
+                        fontSize = 14.sp,
+                        textAlign = TextAlign.Center
+                    )
+                }
+            }
 
-            // Dock — uses persisted pinned apps
             GnomeDock(
-                apps = uiState.pinnedApps,
+                apps = uiState.pinnedApps.take(5),
                 onAppClick = { viewModel.launchApp(it) },
                 onUnpinApp = { viewModel.unpinApp(it) },
                 onAppDrawerClick = onOpenDrawer,
                 onWallpaperClick = {
-                    val intent = Intent(WallpaperManager.ACTION_CHANGE_LIVE_WALLPAPER)
-                        .takeIf { context.packageManager.resolveActivity(it, 0) != null }
-                        ?: Intent(Intent.ACTION_SET_WALLPAPER)
-                    wallpaperLauncher.launch(intent)
+                    val intent = Intent(Intent.ACTION_SET_WALLPAPER)
+                    wallpaperLauncher.launch(Intent.createChooser(intent, "Select Wallpaper"))
                 }
             )
         }
